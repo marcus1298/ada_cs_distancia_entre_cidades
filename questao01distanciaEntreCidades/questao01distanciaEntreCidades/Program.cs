@@ -1,16 +1,16 @@
-﻿/*  Entradas
-5
-
+﻿/*
 15 30 05 12
 10 17 28
 03 11
 80
-
 1, 2, 3, 2, 5, 1, 4
 */
 using Microsoft.VisualBasic;
 using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Security;
+using System.Data.Common;
 
 namespace ConsoleApp1
 {
@@ -18,43 +18,45 @@ namespace ConsoleApp1
     {
         static void Main()
         {
-            Console.WriteLine("Escreva o tamanho da matriz:");
-            int.TryParse(Console.ReadLine(), out int n);
+            string path1 = @"C:\Users\marco\Desktop\matriz.txt";
+            string path2 = @"C:\Users\marco\Desktop\caminho.txt";
+            StreamReader leitor = new StreamReader(path1);
+            string matriz = leitor.ReadToEnd();
+            matriz = matriz.Replace("\r", "");
+            Console.WriteLine(matriz);
+            StreamReader leitor1 = new StreamReader(path2);
+            string percurso = leitor1.ReadToEnd();
+            Console.WriteLine(percurso);
+            matriz = matriz.Trim();
+            percurso = percurso.Trim();
+            string[] matrizNew = matriz.Split(',', '\n');
+            string[] percursoNew = percurso.Split(',');
+            double tamanho = 0;
+            foreach (string element in matrizNew)
+            {
+                tamanho++;
+            }
+            tamanho = Math.Sqrt(tamanho);
+            int n = (int)tamanho;
             int[,] cidades = new int[n, n];
-            Console.WriteLine("Escreva a matriz da diagonal principal para baixo:");
-            for (int i = 0; i < n - 1; i++)
+            string[] splitInputs = matrizNew;
+            int m = 0;
+            for (int i = 0; i < n; i++)
             {
 
-                string a = Console.ReadLine();
-
-
-                string[] splitInputs = a.Split(' ', ',');
-                int m = 0;
-                for (int j = i; j < n; j++)
+                for (int j = 0; j < n; j++)
                 {
-                    if (i == j)
-                    {
-                        int.TryParse("0", out cidades[i, j]);
-                        int.TryParse("0", out cidades[j, i]);
-                    }
-                    else
-                    {
-                        int.TryParse(splitInputs[m], out cidades[i, j]);
-                        int.TryParse(splitInputs[m], out cidades[j, i]);
-                        m++;
-                    }
+                    int.TryParse(splitInputs[m], out cidades[i, j]);
+                    m++;
                 }
             }
-            Console.WriteLine("Escreva um caminho:");
-            string caminho;
-            caminho = Console.ReadLine();
-            caminho = caminho.Trim();
-            string[] splitCaminho = caminho.Split(',');
-            int[] array = splitCaminho.Select(lnq => int.Parse(lnq)).ToArray();
+            int[] array = percursoNew.Select(lnq => int.Parse(lnq)).ToArray();
             int sum = 0;
-            for (int i = 0; i < splitCaminho.Length - 1; i++)
+            Console.WriteLine(cidades);
+            Console.WriteLine(percursoNew);
+            for (int i = 0; i < percursoNew.Length - 1; i++)
             {
-                sum = sum + cidades[Convert.ToInt32(splitCaminho[i]) - 1, Convert.ToInt32(array[(i + 1)]) - 1];
+                sum = sum + cidades[Convert.ToInt32(percursoNew[i]) - 1, Convert.ToInt32(array[(i + 1)]) - 1];
             }
             Console.WriteLine($"{sum} km");
         }
