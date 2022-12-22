@@ -1,16 +1,9 @@
-﻿/*  Entradas
-5
+﻿using System;
+using System.Globalization;
+using System.IO;
+using CsvHelper;
+using CsvHelper.Configuration;
 
-15 30 05 12
-10 17 28
-03 11
-80
-
-1, 2, 3, 2, 5, 1, 4
-*/
-using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
 
 namespace ConsoleApp1
 {
@@ -18,45 +11,58 @@ namespace ConsoleApp1
     {
         static void Main()
         {
-            Console.WriteLine("Escreva o tamanho da matriz:");
-            int.TryParse(Console.ReadLine(), out int n);
-            int[,] cidades = new int[n, n];
-            Console.WriteLine("Escreva a matriz da diagonal principal para baixo:");
-            for (int i = 0; i < n - 1; i++)
+            var Matriz = LeitorCsv("matriz.txt.txt");
+            int tamanhoM = (int)Math.Sqrt(Matriz.Count());
+
+            int[,] cidades = new int[tamanhoM, tamanhoM];
+
+            int m = 0;
+            for (int i = 0; i < tamanhoM; i++)
             {
 
-                string a = Console.ReadLine();
-
-
-                string[] splitInputs = a.Split(' ', ',');
-                int m = 0;
-                for (int j = i; j < n; j++)
+                for (int j = 0; j < tamanhoM; j++)
                 {
-                    if (i == j)
-                    {
-                        int.TryParse("0", out cidades[i, j]);
-                        int.TryParse("0", out cidades[j, i]);
-                    }
-                    else
-                    {
-                        int.TryParse(splitInputs[m], out cidades[i, j]);
-                        int.TryParse(splitInputs[m], out cidades[j, i]);
-                        m++;
-                    }
+                    int.TryParse(Matriz[m], out cidades[i, j]);
+                    m++;
                 }
             }
-            Console.WriteLine("Escreva um caminho:");
-            string caminho;
-            caminho = Console.ReadLine();
-            caminho = caminho.Trim();
-            string[] splitCaminho = caminho.Split(',');
-            int[] array = splitCaminho.Select(lnq => int.Parse(lnq)).ToArray();
+            var Percurso = LeitorCsv("caminho.txt.txt");
             int sum = 0;
-            for (int i = 0; i < splitCaminho.Length - 1; i++)
+            for (int i = 0; i < Percurso.Count() - 1; i++)
             {
-                sum = sum + cidades[Convert.ToInt32(splitCaminho[i]) - 1, Convert.ToInt32(array[(i + 1)]) - 1];
+                sum = sum + cidades[Convert.ToInt32(Percurso[i]) - 1, Convert.ToInt32(Percurso[(i + 1)]) - 1];
             }
             Console.WriteLine($"{sum} km");
+
+        }
+        public static string ConfigFile(string nomeArquivo)
+        {
+            var caminhoDesktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var caminhoArquivo = Path.Combine(caminhoDesktop, nomeArquivo);
+            return caminhoArquivo;
+        }
+
+        public static List<string> LeitorCsv(string nomeArquivo)
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = false,
+            };
+            var caminhoMatriz = ConfigFile(nomeArquivo);
+            using var reader = new StreamReader(caminhoMatriz);
+            using var csv = new CsvParser(reader, config);
+
+            var items = new List<string>();
+
+            while (csv.Read())
+            {
+                foreach (var item in csv.Record)
+                {
+                    items.Add(item);
+                }
+            }
+
+            return items;
         }
     }
 }
